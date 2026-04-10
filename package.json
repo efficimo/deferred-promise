@@ -1,0 +1,53 @@
+{
+  "name": "@efficimo/deferred-promise",
+  "version": "0.1.0",
+  "description": "Extend native Promises with external resolve/reject, status tracking, timeout, abort signal and deferred maps. Fully typed. Directly awaitable.",
+  "author": "efficimo",
+  "license": "MIT",
+  "keywords": [
+    "promise",
+    "deferred",
+    "async",
+    "timeout",
+    "abort",
+    "typescript",
+    "rpc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/efficimo/deferred-promise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/efficimo/deferred-promise/issues"
+  },
+  "homepage": "https://github.com/efficimo/deferred-promise#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
