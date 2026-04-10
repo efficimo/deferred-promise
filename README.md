@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/npm/l/@efficimo/deferred-promise)](./LICENSE)
 [![types](https://img.shields.io/npm/types/@efficimo/deferred-promise)](https://www.npmjs.com/package/@efficimo/deferred-promise)
 
-> Extend native Promises with external resolve/reject, status tracking, timeout, abort signal, progress reporting and deferred maps. Fully typed. Directly awaitable.
+> Extend native Promises with external resolve/reject, status tracking, timeout, abort signal, progress reporting, lazy execution and deferred maps. Fully typed. Directly awaitable.
 
 ## Why
 
@@ -218,6 +218,52 @@ deferred.resolve('done');
 deferred.progress({ percent: 99 }); // ignored
 
 const result = await deferred; // 'done'
+```
+
+---
+
+### `LazyPromise<T>`
+
+Extends `Promise<T>`. Defers execution of the executor until the first `then`, `catch`, `finally`, or `await`. Useful when the side effect (network request, file read, heavy computation) should only start when a consumer is actually ready.
+
+```typescript
+new LazyPromise<T>(executor)
+```
+
+| Member | Type | Description |
+|---|---|---|
+| `status` | `'pending' \| 'fulfilled' \| 'rejected'` | Current lifecycle state |
+| `isPending` | `boolean` | Shorthand for `status === 'pending'` |
+| `isStarted` | `boolean` | `true` once the executor has been triggered |
+
+```typescript
+import { LazyPromise } from '@efficimo/deferred-promise';
+
+const lazy = new LazyPromise<string>((resolve) => {
+  console.log('executor running');
+  resolve('hello');
+});
+
+// nothing has run yet — executor is still dormant
+console.log(lazy.isStarted); // false
+console.log(lazy.status);    // 'pending'
+
+// first await triggers the executor
+const result = await lazy;
+// logs: 'executor running'
+
+console.log(result);         // 'hello'
+console.log(lazy.isStarted); // true
+console.log(lazy.status);    // 'fulfilled'
+```
+
+Multiple `then`/`await` calls are safe — the executor runs exactly once:
+
+```typescript
+const lazy = new LazyPromise<number>((resolve) => resolve(42));
+
+const [a, b] = await Promise.all([lazy, lazy]);
+// executor ran once, both consumers receive 42
 ```
 
 ---
