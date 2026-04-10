@@ -45,9 +45,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test .test-out/test/*.test.js",
     "prepublishOnly": "npm run build && npm run typecheck"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "typescript": "^5.0.0"
   }
 }

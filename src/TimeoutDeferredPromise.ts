@@ -19,23 +19,21 @@ export class TimeoutDeferredPromise<T> extends DeferredPromise<T> {
     message?: string | ((timeoutMs: number) => string),
     executor?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void,
   ) {
-    let timer!: ReturnType<typeof setTimeout>;
+    super(executor);
 
-    super((resolve, reject) => {
-      timer = setTimeout(() => reject(new Error(resolveMessage(message, timeoutMs))), timeoutMs);
-      executor?.(resolve, reject);
-    });
-
-    this._timer = timer;
     this._timeoutMs = timeoutMs;
     this._message = message;
+    this._timer = setTimeout(
+      () => this.reject(new Error(resolveMessage(message, timeoutMs))),
+      timeoutMs,
+    );
   }
 
   extendTimeout(timeoutMs = this._timeoutMs): void {
     if (!this.isPending) return;
     clearTimeout(this._timer);
     this._timer = setTimeout(
-      () => super.reject(new Error(resolveMessage(this._message, timeoutMs))),
+      () => this.reject(new Error(resolveMessage(this._message, timeoutMs))),
       timeoutMs,
     );
   }

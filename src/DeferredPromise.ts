@@ -5,6 +5,11 @@ export class DeferredPromise<T> extends Promise<T> {
   private _reject!: (reason?: unknown) => void;
   private _status: PromiseStatus = 'pending';
 
+  // Prevent .then()/.catch()/.finally() from constructing subclass instances.
+  // Without this, chaining calls `new SubClass(internalExecutor)` which breaks
+  // subclasses that expect specific constructor arguments (e.g. timeoutMs, signal).
+  static override get [Symbol.species]() { return Promise; }
+
   constructor(
     executor?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void,
   ) {
