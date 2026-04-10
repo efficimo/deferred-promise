@@ -7,7 +7,8 @@
     "declarationMap": true,
     "sourceMap": true,
     "rootDir": "src",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "types": []
   },
   "include": ["src"]
 }
