@@ -1,4 +1,4 @@
-import { DeferredPromise } from './DeferredPromise';
+import { DeferredPromise } from "./DeferredPromise";
 
 export class DeferredMap<K, T> {
   private readonly _map = new Map<K, DeferredPromise<T>>();
@@ -39,7 +39,7 @@ export class DeferredMap<K, T> {
 
   clear(): void {
     for (const deferred of this._map.values()) {
-      deferred.reject(new Error('DeferredMap: cleared'));
+      deferred.reject(new Error("DeferredMap: cleared"));
     }
     this._map.clear();
   }

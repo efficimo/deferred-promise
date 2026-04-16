@@ -1,19 +1,27 @@
-import type { PromiseStatus } from './DeferredPromise';
+import type { PromiseStatus } from "./DeferredPromise";
 
 export class LazyPromise<T> extends Promise<T> {
-  private _executor: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void;
+  private _executor: (
+    resolve: (value: T | PromiseLike<T>) => void,
+    reject: (reason?: unknown) => void,
+  ) => void;
   private _resolve!: (value: T | PromiseLike<T>) => void;
   private _reject!: (reason?: unknown) => void;
-  private _status: PromiseStatus = 'pending';
+  private _status: PromiseStatus = "pending";
   private _started = false;
 
   // Prevent .then()/.catch()/.finally() from constructing subclass instances.
   // Without this, chaining calls `new SubClass(internalExecutor)` which breaks
   // subclasses that expect specific constructor arguments (e.g. timeoutMs, signal).
-  static override get [Symbol.species]() { return Promise; }
+  static override get [Symbol.species]() {
+    return Promise;
+  }
 
   constructor(
-    executor: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void,
+    executor: (
+      resolve: (value: T | PromiseLike<T>) => void,
+      reject: (reason?: unknown) => void,
+    ) => void,
   ) {
     let _resolve!: (value: T | PromiseLike<T>) => void;
     let _reject!: (reason?: unknown) => void;
@@ -30,12 +38,19 @@ export class LazyPromise<T> extends Promise<T> {
     this._executor = executor;
   }
 
-  get status(): PromiseStatus { return this._status; }
-  get isPending(): boolean { return this._status === 'pending'; }
-  get isStarted(): boolean { return this._started; }
+  get status(): PromiseStatus {
+    return this._status;
+  }
+  get isPending(): boolean {
+    return this._status === "pending";
+  }
+  get isStarted(): boolean {
+    return this._started;
+  }
 
   // Overriding then is sufficient: catch and finally delegate to this.then()
   // via dynamic dispatch (ECMAScript Invoke), so they trigger _start() transitively.
+  // biome-ignore lint/suspicious/noThenProperty: LazyPromise is intentionally thenable
   override then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
     onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null | undefined,
@@ -49,11 +64,11 @@ export class LazyPromise<T> extends Promise<T> {
     this._started = true;
     this._executor(
       (value) => {
-        this._status = 'fulfilled';
+        this._status = "fulfilled";
         this._resolve(value);
       },
       (reason) => {
-        this._status = 'rejected';
+        this._status = "rejected";
         this._reject(reason);
       },
     );

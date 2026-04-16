@@ -46,9 +46,12 @@
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
     "typecheck": "tsc --noEmit",
     "test": "tsc -p tsconfig.test.json && node --test .test-out/test/*.test.js",
+    "lint": "biome ci .",
+    "format": "biome check --write .",
     "prepublishOnly": "npm run build && npm run typecheck"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
     "@types/node": "^25.6.0",
     "typescript": "^5.0.0",
     "undici-types": "^8.0.2"

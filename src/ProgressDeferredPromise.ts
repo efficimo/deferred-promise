@@ -1,4 +1,4 @@
-import { DeferredPromise } from './DeferredPromise';
+import { DeferredPromise } from "./DeferredPromise";
 
 export class ProgressDeferredPromise<T, P> extends DeferredPromise<T> {
   private _listeners: ((progress: P) => void)[] = [];

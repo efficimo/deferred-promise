@@ -1,10 +1,10 @@
-import { DeferredPromise } from './DeferredPromise';
+import { DeferredPromise } from "./DeferredPromise";
 
 function resolveMessage(
   message: string | ((ms: number) => string) | undefined,
   ms: number,
 ): string {
-  return typeof message === 'function'
+  return typeof message === "function"
     ? message(ms)
     : (message ?? `Deferred timed out after ${ms}ms`);
 }
@@ -17,7 +17,10 @@ export class TimeoutDeferredPromise<T> extends DeferredPromise<T> {
   constructor(
     timeoutMs: number,
     message?: string | ((timeoutMs: number) => string),
-    executor?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void,
+    executor?: (
+      resolve: (value: T | PromiseLike<T>) => void,
+      reject: (reason?: unknown) => void,
+    ) => void,
   ) {
     super(executor);
 
