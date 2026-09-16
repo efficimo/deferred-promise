@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { TimeoutDeferredPromise } from "../src/TimeoutDeferredPromise";
+import { TimeoutDeferredPromise } from "../src/TimeoutDeferredPromise.ts";
 
 describe("TimeoutDeferredPromise", () => {
   it("rejects after timeout", async (t) => {

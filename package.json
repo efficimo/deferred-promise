@@ -1,7 +1,7 @@
 {
   "name": "@efficimo/deferred-promise",
-  "version": "0.1.0",
-  "description": "Extend native Promises with external resolve/reject, status tracking, timeout, abort signal and deferred maps. Fully typed. Directly awaitable.",
+  "version": "0.0.0",
+  "description": "Extend native Promises with external resolve/reject, status tracking, timeout, abort signal, progress reporting, lazy execution and deferred maps. Fully typed. Directly awaitable.",
   "author": "efficimo",
   "license": "MIT",
   "keywords": [
@@ -10,12 +10,14 @@
     "async",
     "timeout",
     "abort",
+    "progress",
+    "lazy",
     "typescript",
     "rpc"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/efficimo/deferred-promise.git"
+    "url": "git+https://github.com/efficimo/deferred-promise.git"
   },
   "bugs": {
     "url": "https://github.com/efficimo/deferred-promise/issues"
@@ -24,6 +26,8 @@
   "engines": {
     "node": ">=18"
   },
+  "type": "commonjs",
+  "sideEffects": false,
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/esm/index.d.ts",
@@ -40,8 +44,13 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
     "typecheck": "tsc --noEmit",
@@ -51,9 +60,8 @@
     "prepublishOnly": "npm run build && npm run typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
-    "@types/node": "^25.6.0",
-    "typescript": "^5.0.0",
-    "undici-types": "^8.0.2"
+    "@biomejs/biome": "^2.5.14",
+    "@types/node": "^25.9.7",
+    "typescript": "^7.0.2"
   }
 }

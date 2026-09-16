@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { DeferredPromise } from "../src/DeferredPromise";
+import { DeferredPromise } from "../src/DeferredPromise.ts";
 
 describe("DeferredPromise", () => {
   it("starts in pending state", () => {

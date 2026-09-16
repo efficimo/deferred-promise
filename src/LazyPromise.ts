@@ -1,4 +1,4 @@
-import type { PromiseStatus } from "./DeferredPromise";
+import type { PromiseStatus } from "./DeferredPromise.ts";
 
 export class LazyPromise<T> extends Promise<T> {
   private _executor: (

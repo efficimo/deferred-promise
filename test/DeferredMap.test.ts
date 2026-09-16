@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { DeferredMap } from "../src/DeferredMap";
+import { DeferredMap } from "../src/DeferredMap.ts";
 
 describe("DeferredMap", () => {
   it("get creates an entry if absent", () => {

@@ -76,6 +76,17 @@ const deferred = new DeferredPromise<number>((resolve) => {
 });
 ```
 
+Chaining returns a **native** `Promise`, not a deferred — `Symbol.species` is overridden so that `then`/`catch`/`finally` never try to rebuild a subclass instance (which would fail for subclasses requiring constructor arguments, such as `timeoutMs` or `signal`):
+
+```typescript
+const deferred = new DeferredPromise<number>();
+
+deferred instanceof DeferredPromise;              // true
+deferred.then(v => v) instanceof DeferredPromise; // false — a plain Promise
+
+// keep a reference to the deferred itself to call resolve/reject later
+```
+
 ---
 
 ### `TimeoutDeferredPromise<T>`
@@ -89,7 +100,7 @@ new TimeoutDeferredPromise<T>(timeoutMs, message?, executor?)
 | Parameter | Type | Description |
 |---|---|---|
 | `timeoutMs` | `number` | Delay in milliseconds before auto-rejection |
-| `message` | `string \| (ms: number) => string` | Custom error message or factory |
+| `message` | `string \| (ms: number) => string` | Custom error message or factory. Defaults to `Deferred timed out after {ms}ms`. |
 | `executor` | `function` | Optional executor, runs alongside the timer |
 
 | Member | Description |
@@ -271,18 +282,29 @@ const [a, b] = await Promise.all([lazy, lazy]);
 ## Real-world example: RPC over WebSocket
 
 ```typescript
-import { DeferredMap, TimeoutDeferredPromise } from '@efficimo/deferred-promise';
+import { DeferredMap } from '@efficimo/deferred-promise';
 
 type RpcResponse = { result: unknown };
 
 const pending = new DeferredMap<string, RpcResponse>();
+const timers = new Map<string, ReturnType<typeof setTimeout>>();
 let callCounter = 0;
 
 function call(method: string, params: unknown): Promise<RpcResponse> {
   const callId = `${method}-${++callCounter}`;
-  const deferred = new TimeoutDeferredPromise<RpcResponse>(10_000, `RPC "${method}" timed out`);
 
-  pending.get(callId); // register the key
+  // get() creates the deferred and registers it under the key — return that
+  // very instance, otherwise resolve(callId, ...) would settle a different promise
+  const deferred = pending.get(callId);
+
+  timers.set(
+    callId,
+    setTimeout(() => {
+      timers.delete(callId);
+      pending.reject(callId, new Error(`RPC "${method}" timed out`));
+    }, 10_000),
+  );
+
   socket.send(JSON.stringify({ callId, method, params }));
 
   return deferred;
@@ -290,7 +312,12 @@ function call(method: string, params: unknown): Promise<RpcResponse> {
 
 socket.on('message', (raw: string) => {
   const { callId, result, error } = JSON.parse(raw);
-  error ? pending.reject(callId, error) : pending.resolve(callId, { result });
+
+  clearTimeout(timers.get(callId));
+  timers.delete(callId);
+
+  if (error) pending.reject(callId, error);
+  else pending.resolve(callId, { result });
 });
 
 socket.on('close', () => pending.clear());
@@ -299,11 +326,29 @@ socket.on('close', () => pending.clear());
 const { result } = await call('getUser', { id: 42 });
 ```
 
+> `DeferredMap` always stores plain `DeferredPromise` instances, so a per-call timeout is driven from the outside via `reject(key, reason)`. Use `TimeoutDeferredPromise` directly when a call is not correlated by key.
+
 ---
+
+## Local development
+
+```bash
+npm ci
+npm run lint       # biome ci .
+npm run typecheck  # tsc --noEmit
+npm run test       # compiles to .test-out, runs node --test
+npm run build      # dist/esm + dist/cjs
+```
+
+## Publishing
+
+| Tag | Publishes |
+|---|---|
+| `v1.2.3` | `@efficimo/deferred-promise@1.2.3` |
 
 ## Contributing
 
-Issues and PRs are welcome at [github.com/efficimo/@efficimo/deferred-promise](https://github.com/efficimo/@efficimo/deferred-promise).
+Issues and PRs are welcome at [github.com/efficimo/deferred-promise](https://github.com/efficimo/deferred-promise).
 
 ## License
 

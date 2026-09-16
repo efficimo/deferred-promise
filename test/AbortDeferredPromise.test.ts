@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { AbortDeferredPromise } from "../src/AbortDeferredPromise";
+import { AbortDeferredPromise } from "../src/AbortDeferredPromise.ts";
 
 describe("AbortDeferredPromise", () => {
   it("rejects when signal is aborted", async () => {

@@ -1,4 +1,4 @@
-import { DeferredPromise } from "./DeferredPromise";
+import { DeferredPromise } from "./DeferredPromise.ts";
 
 export class AbortDeferredPromise<T> extends DeferredPromise<T> {
   private _onAbort: (() => void) | null = null;

@@ -1,4 +1,4 @@
-import { DeferredPromise } from "./DeferredPromise";
+import { DeferredPromise } from "./DeferredPromise.ts";
 
 function resolveMessage(
   message: string | ((ms: number) => string) | undefined,

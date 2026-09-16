@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { ProgressDeferredPromise } from "../src/ProgressDeferredPromise";
+import { ProgressDeferredPromise } from "../src/ProgressDeferredPromise.ts";
 
 describe("ProgressDeferredPromise", () => {
   it("notifies progress listeners", () => {

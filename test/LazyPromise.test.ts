@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { LazyPromise } from "../src/LazyPromise";
+import { LazyPromise } from "../src/LazyPromise.ts";
 
 describe("LazyPromise", () => {
   it("should not run the executor before the first then/await", () => {
@@ -85,5 +85,42 @@ describe("LazyPromise", () => {
     assert.equal(executed, false);
     await lp.catch(() => {});
     assert.equal(executed, true);
+  });
+
+  it("should trigger the executor via finally", async () => {
+    let executed = false;
+    let finallyCalled = false;
+    const lp = new LazyPromise<number>((resolve) => {
+      executed = true;
+      resolve(42);
+    });
+    assert.equal(executed, false);
+    assert.equal(
+      await lp.finally(() => {
+        finallyCalled = true;
+      }),
+      42,
+    );
+    assert.equal(executed, true);
+    assert.equal(finallyCalled, true);
+    assert.equal(lp.status, "fulfilled");
+  });
+
+  it("should trigger the executor via finally on rejection", async () => {
+    let executed = false;
+    let finallyCalled = false;
+    const lp = new LazyPromise<number>((_, reject) => {
+      executed = true;
+      reject(new Error("oops"));
+    });
+    assert.equal(executed, false);
+    await lp
+      .finally(() => {
+        finallyCalled = true;
+      })
+      .catch(() => {});
+    assert.equal(executed, true);
+    assert.equal(finallyCalled, true);
+    assert.equal(lp.status, "rejected");
   });
 });

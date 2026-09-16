@@ -1,4 +1,4 @@
-import { DeferredPromise } from "./DeferredPromise";
+import { DeferredPromise } from "./DeferredPromise.ts";
 
 export class DeferredMap<K, T> {
   private readonly _map = new Map<K, DeferredPromise<T>>();
